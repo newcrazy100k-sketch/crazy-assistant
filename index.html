@@ -1,1318 +1,855 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1020">
-<meta name="description" content="Crazy Assistant - Your AI Assistant">
-
-<title>Crazy Assistant</title>
-
-<style>
-*{
-  box-sizing:border-box;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-}
-
-body{
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Arial,
-    sans-serif;
-  background:#080c18;
-  color:#fff;
-  overflow:hidden;
-}
-
-button,
-input,
-textarea,
-select{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-/* APP */
-
-.app{
-  width:100%;
-  height:100vh;
-  display:flex;
-  background:#080c18;
-}
-
-/* SIDEBAR */
-
-.sidebar{
-  width:270px;
-  height:100%;
-  background:#0d1324;
-  border-right:1px solid #202a43;
-  display:flex;
-  flex-direction:column;
-  padding:14px;
-  transition:.25s;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:8px 5px 18px;
-}
-
-.brandIcon{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  background:linear-gradient(135deg,#725cff,#00d4ff);
-  display:grid;
-  place-items:center;
-  font-size:22px;
-  box-shadow:0 8px 25px rgba(72,92,255,.25);
-}
-
-.brandText strong{
-  display:block;
-  font-size:17px;
-}
-
-.brandText span{
-  display:block;
-  color:#8490ab;
-  font-size:11px;
-  margin-top:2px;
-}
-
-.newChat{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #293553;
-  background:#151e35;
-  color:#fff;
-  text-align:left;
-  margin-bottom:15px;
-}
-
-.newChat:hover{
-  background:#1b2743;
-}
-
-.historyTitle{
-  color:#737f9c;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  padding:8px 5px;
-}
-
-.history{
-  flex:1;
-  overflow-y:auto;
-}
-
-.historyItem{
-  padding:10px 11px;
-  border-radius:10px;
-  color:#b9c2d7;
-  font-size:13px;
-  margin-bottom:4px;
-  cursor:pointer;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.historyItem:hover{
-  background:#161f36;
-  color:white;
-}
-
-.sidebarBottom{
-  border-top:1px solid #202a43;
-  padding-top:12px;
-}
-
-.sideButton{
-  width:100%;
-  background:transparent;
-  border:0;
-  color:#aeb8ce;
-  text-align:left;
-  padding:10px;
-  border-radius:10px;
-}
-
-.sideButton:hover{
-  background:#161f36;
-  color:white;
-}
-
-/* MAIN */
-
-.main{
-  flex:1;
-  min-width:0;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-}
-
-/* HEADER */
-
-.header{
-  height:68px;
-  flex-shrink:0;
-  border-bottom:1px solid #202a43;
-  background:#0b1020;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 18px;
-}
-
-.headerLeft{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.menuButton{
-  display:none;
-  width:38px;
-  height:38px;
-  border:1px solid #293553;
-  border-radius:10px;
-  background:#151e35;
-  color:white;
-}
-
-.modeSelect{
-  background:#151e35;
-  border:1px solid #293553;
-  color:white;
-  padding:9px 12px;
-  border-radius:10px;
-  outline:none;
-}
-
-.headerActions{
-  display:flex;
-  gap:7px;
-}
-
-.iconButton{
-  width:38px;
-  height:38px;
-  border-radius:10px;
-  border:1px solid #293553;
-  background:#151e35;
-  color:#fff;
-}
-
-.iconButton:hover{
-  background:#1b2743;
-}
-
-/* CHAT */
-
-.chat{
-  flex:1;
-  overflow-y:auto;
-  padding:20px 18px 150px;
-  scroll-behavior:smooth;
-}
-
-.chatInner{
-  max-width:850px;
-  margin:auto;
-}
-
-/* WELCOME */
-
-.welcome{
-  text-align:center;
-  padding:50px 10px 20px;
-}
-
-.welcomeIcon{
-  width:75px;
-  height:75px;
-  margin:auto;
-  border-radius:25px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(135deg,#725cff,#00d4ff);
-  font-size:40px;
-  box-shadow:0 15px 45px rgba(77,93,255,.2);
-}
-
-.welcome h1{
-  font-size:32px;
-  margin:18px 0 8px;
-}
-
-.welcome p{
-  color:#8f9ab5;
-  max-width:600px;
-  margin:auto;
-  line-height:1.6;
-}
-
-.quickGrid{
-  max-width:700px;
-  margin:30px auto;
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-
-.quickCard{
-  background:#111a30;
-  border:1px solid #293553;
-  padding:15px;
-  border-radius:14px;
-  text-align:left;
-  color:#d8dfef;
-  transition:.2s;
-}
-
-.quickCard:hover{
-  background:#17223d;
-  transform:translateY(-1px);
-}
-
-/* MESSAGE */
-
-.message{
-  display:flex;
-  gap:10px;
-  margin:20px 0;
-}
-
-.message.user{
-  justify-content:flex-end;
-}
-
-.avatar{
-  width:34px;
-  height:34px;
-  min-width:34px;
-  border-radius:11px;
-  display:grid;
-  place-items:center;
-  background:#172139;
-  border:1px solid #293553;
-  font-size:16px;
-}
-
-.user .avatar{
-  order:2;
-  background:#6755e8;
-}
-
-.messageBody{
-  max-width:min(78%,700px);
-}
-
-.bubble{
-  padding:13px 15px;
-  border-radius:17px;
-  line-height:1.6;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-}
-
-.bot .bubble{
-  background:#111a2d;
-  border:1px solid #293553;
-  border-bottom-left-radius:5px;
-}
-
-.user .bubble{
-  background:#6755e8;
-  border-bottom-right-radius:5px;
-}
-
-.messageTools{
-  display:flex;
-  gap:5px;
-  margin-top:6px;
-}
-
-.toolBtn{
-  border:0;
-  background:transparent;
-  color:#687590;
-  padding:4px 7px;
-  border-radius:7px;
-  font-size:12px;
-}
-
-.toolBtn:hover{
-  background:#151e35;
-  color:#cbd4e8;
-}
-
-/* TYPING */
-
-.typing{
-  display:flex;
-  align-items:center;
-  gap:5px;
-  padding:4px 2px;
-}
-
-.dot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:#8793ad;
-  animation:bounce 1.2s infinite;
-}
-
-.dot:nth-child(2){
-  animation-delay:.15s;
-}
-
-.dot:nth-child(3){
-  animation-delay:.3s;
-}
-
-@keyframes bounce{
-  0%,60%,100%{
-    transform:translateY(0);
-    opacity:.4;
-  }
-  30%{
-    transform:translateY(-5px);
-    opacity:1;
-  }
-}
-
-/* COMPOSER */
-
-.composerWrap{
-  position:fixed;
-  bottom:0;
-  left:270px;
-  right:0;
-  padding:12px 16px 15px;
-  background:linear-gradient(
-    to top,
-    #080c18 70%,
-    rgba(8,12,24,.85),
-    transparent
-  );
-}
-
-.composer{
-  max-width:850px;
-  margin:auto;
-  background:#111a2d;
-  border:1px solid #303b58;
-  border-radius:18px;
-  padding:9px;
-  box-shadow:0 10px 40px rgba(0,0,0,.3);
-}
-
-.preview{
-  display:none;
-  padding:5px;
-  margin-bottom:5px;
-}
-
-.previewBox{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  background:#172139;
-  border:1px solid #293553;
-  padding:7px 10px;
-  border-radius:10px;
-  font-size:12px;
-  color:#c5cee1;
-}
-
-.previewBox img{
-  width:35px;
-  height:35px;
-  object-fit:cover;
-  border-radius:7px;
-}
-
-.composerRow{
-  display:flex;
-  align-items:flex-end;
-  gap:7px;
-}
-
-.textarea{
-  flex:1;
-  min-width:0;
-  min-height:44px;
-  max-height:150px;
-  resize:none;
-  border:0;
-  outline:none;
-  background:transparent;
-  color:white;
-  padding:11px 8px;
-}
-
-.textarea::placeholder{
-  color:#6f7b96;
-}
-
-.actionBtn{
-  width:42px;
-  height:42px;
-  flex-shrink:0;
-  border-radius:12px;
-  border:1px solid #293553;
-  background:#172139;
-  color:#d5dced;
-}
-
-.actionBtn:hover{
-  background:#202c48;
-}
-
-.sendBtn{
-  background:#6958ee;
-  border-color:#6958ee;
-  color:#fff;
-}
-
-.sendBtn:hover{
-  background:#7869f5;
-}
-
-.bottomInfo{
-  max-width:850px;
-  margin:7px auto 0;
-  text-align:center;
-  font-size:10px;
-  color:#59657f;
-}
-
-/* MODAL */
-
-.modalOverlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000;
-  padding:15px;
-}
-
-.modal{
-  width:100%;
-  max-width:470px;
-  background:#10182b;
-  border:1px solid #2c3855;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 25px 80px rgba(0,0,0,.5);
-}
-
-.modalHeader{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:20px;
-}
-
-.modalHeader h2{
-  margin:0;
-  font-size:19px;
-}
-
-.closeBtn{
-  width:35px;
-  height:35px;
-  border:0;
-  border-radius:9px;
-  background:#19233a;
-  color:white;
-}
-
-.setting{
-  padding:14px 0;
-  border-bottom:1px solid #202a43;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-}
-
-.setting:last-child{
-  border-bottom:0;
-}
-
-.settingText strong{
-  display:block;
-  font-size:14px;
-}
-
-.settingText span{
-  display:block;
-  color:#77839e;
-  font-size:11px;
-  margin-top:4px;
-  line-height:1.4;
-}
-
-.switch{
-  position:relative;
-  width:45px;
-  height:25px;
-  flex-shrink:0;
-}
-
-.switch input{
-  display:none;
-}
-
-.slider{
-  position:absolute;
-  inset:0;
-  border-radius:30px;
-  background:#293553;
-  cursor:pointer;
-}
-
-.slider:before{
-  content:"";
-  position:absolute;
-  width:19px;
-  height:19px;
-  left:3px;
-  top:3px;
-  border-radius:50%;
-  background:white;
-  transition:.2s;
-}
-
-.switch input:checked + .slider{
-  background:#6958ee;
-}
-
-.switch input:checked + .slider:before{
-  transform:translateX(20px);
-}
-
-.personaSelect{
-  width:100%;
-  margin-top:6px;
-  background:#151e35;
-  border:1px solid #293553;
-  color:white;
-  padding:10px;
-  border-radius:10px;
-}
-
-/* MOBILE */
-
-@media(max-width:800px){
-
-  .sidebar{
-    position:fixed;
-    left:-285px;
-    top:0;
-    bottom:0;
-    z-index:900;
-  }
-
-  .sidebar.open{
-    left:0;
-  }
-
-  .menuButton{
-    display:block;
-  }
-
-  .composerWrap{
-    left:0;
-  }
-
-  .header{
-    padding:0 10px;
-  }
-
-  .headerActions .hideMobile{
-    display:none;
-  }
-
-  .chat{
-    padding-left:10px;
-    padding-right:10px;
-  }
-
-  .messageBody{
-    max-width:88%;
-  }
-}
-
-@media(max-width:600px){
-
-  .welcome{
-    padding-top:35px;
-  }
-
-  .welcome h1{
-    font-size:25px;
-  }
-
-  .quickGrid{
-    grid-template-columns:1fr;
-  }
-
-  .modeSelect{
-    max-width:130px;
-  }
-
-  .composerWrap{
-    padding:8px;
-  }
-
-  .bottomInfo{
-    display:none;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crazy Assistant</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b1020;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #11182b;
+      border-right: 1px solid #26304a;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .new-chat {
+      width: 100%;
+      padding: 13px;
+      border: 0;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .new-chat:hover {
+      background: #1d4ed8;
+    }
+
+    .history-title {
+      color: #9ca3af;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    #history {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .history-item {
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #d1d5db;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-item:hover {
+      background: #1d2740;
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 60px;
+      border-bottom: 1px solid #26304a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: #0f172a;
+    }
+
+    .topbar-title {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    select {
+      background: #18223a;
+      color: white;
+      border: 1px solid #334155;
+      padding: 8px 10px;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    /* Chat */
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 25px;
+    }
+
+    .welcome {
+      max-width: 700px;
+      margin: 80px auto;
+      text-align: center;
+    }
+
+    .welcome h1 {
+      font-size: 34px;
+      margin-bottom: 12px;
+    }
+
+    .welcome p {
+      color: #9ca3af;
+      line-height: 1.6;
+    }
+
+    .message {
+      max-width: 850px;
+      margin: 0 auto 18px auto;
+      display: flex;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 80%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .user .bubble {
+      background: #2563eb;
+    }
+
+    .assistant .bubble {
+      background: #18223a;
+      border: 1px solid #293653;
+    }
+
+    .typing {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    /* Composer */
+    .composer-area {
+      padding: 15px 20px 20px;
+      border-top: 1px solid #26304a;
+      background: #0f172a;
+    }
+
+    .composer {
+      max-width: 900px;
+      margin: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: #18223a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 8px;
+    }
+
+    .composer input[type="text"] {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      outline: none;
+      color: white;
+      font-size: 16px;
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .composer input[type="text"]::placeholder {
+      color: #64748b;
+    }
+
+    .icon-btn {
+      border: 0;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      background: #26334f;
+    }
+
+    .send-btn {
+      background: #2563eb;
+      color: white;
+      border: 0;
+      border-radius: 9px;
+      width: 45px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .send-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-name {
+      max-width: 900px;
+      margin: 8px auto 0;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    /* Mobile */
+    @media (max-width: 700px) {
+      .sidebar {
+        display: none;
+      }
+
+      .topbar {
+        padding: 0 12px;
+      }
+
+      #chat {
+        padding: 15px 10px;
+      }
+
+      .bubble {
+        max-width: 90%;
+      }
+
+      .welcome {
+        margin: 80px 15px;
+      }
+
+      .welcome h1 {
+        font-size: 28px;
+      }
+
+      .composer-area {
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="app">
 
-<!-- SIDEBAR -->
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">⚡ Crazy Assistant</div>
 
-<aside class="sidebar" id="sidebar">
-
-  <div class="brand">
-    <div class="brandIcon">🤖</div>
-    <div class="brandText">
-      <strong>Crazy Assistant</strong>
-      <span>Your AI Assistant</span>
-    </div>
-  </div>
-
-  <button class="newChat" onclick="newChat()">
-    ＋ New Chat
-  </button>
-
-  <div class="historyTitle">
-    Chat History
-  </div>
-
-  <div class="history" id="history"></div>
-
-  <div class="sidebarBottom">
-
-    <button class="sideButton" onclick="openSettings()">
-      ⚙️ Settings
+    <button class="new-chat" id="newChatBtn">
+      ＋ New Chat
     </button>
 
-    <button class="sideButton" onclick="clearAllHistory()">
-      🗑️ Clear History
-    </button>
-
-  </div>
-
-</aside>
-
-
-<!-- MAIN -->
-
-<section class="main">
-
-<header class="header">
-
-  <div class="headerLeft">
-
-    <button
-      class="menuButton"
-      onclick="toggleSidebar()">
-      ☰
-    </button>
-
-    <select
-      class="modeSelect"
-      id="modeSelect"
-      onchange="changeMode()">
-
-      <option value="assistant">🤖 Assistant</option>
-      <option value="coding">💻 Coding</option>
-      <option value="study">📚 Study</option>
-      <option value="creative">✍️ Creative</option>
-      <option value="gaming">🎮 Gaming</option>
-
-    </select>
-
-  </div>
-
-  <div class="headerActions">
-
-    <button
-      class="iconButton hideMobile"
-      onclick="toggleVoiceOutput()"
-      title="Voice Output">
-      🔊
-    </button>
-
-    <button
-      class="iconButton"
-      onclick="openSettings()"
-      title="Settings">
-      ⚙️
-    </button>
-
-  </div>
-
-</header>
-
-
-<!-- CHAT AREA -->
-
-<main class="chat" id="chat">
-
-<div class="chatInner" id="chatInner">
-
-<section class="welcome" id="welcome">
-
-  <div class="welcomeIcon">
-    🤖
-  </div>
-
-  <h1>Hi! I'm Crazy Assistant</h1>
-
-  <p>
-    Ask me anything. I can help with study, coding,
-    technology, gaming, YouTube, writing and more.
-  </p>
-
-  <div class="quickGrid">
-
-    <button
-      class="quickCard"
-      onclick="quickAsk('भारत की राजधानी क्या है?')">
-      🌍 General Knowledge
-    </button>
-
-    <button
-      class="quickCard"
-      onclick="quickAsk('सूर्य के बारे में आसान भाषा में बताओ')">
-      🔬 Science
-    </button>
-
-    <button
-      class="quickCard"
-      onclick="quickAsk('मुझे JavaScript सीखने में मदद करो')">
-      💻 Coding
-    </button>
-
-    <button
-      class="quickCard"
-      onclick="quickAsk('मुझे पढ़ाई के लिए एक अच्छा timetable बनाकर दो')">
-      📚 Study
-    </button>
-
-    <button
-      class="quickCard"
-      onclick="quickAsk('मेरे gaming YouTube channel के लिए 10 titles दो')">
-      🎮 Gaming
-    </button>
-
-    <button
-      class="quickCard"
-      onclick="quickAsk('एक छोटी interesting कहानी लिखो')">
-      ✍️ Creative
-    </button>
-
-  </div>
-
-</section>
-
-</div>
-
-</main>
-
-
-<!-- COMPOSER -->
-
-<div class="composerWrap">
-
-  <div class="composer">
-
-    <div class="preview" id="preview">
-
-      <div class="previewBox" id="previewBox"></div>
-
-    </div>
-
-    <div class="composerRow">
-
-      <button
-        class="actionBtn"
-        onclick="document.getElementById('fileInput').click()"
-        title="Upload">
-        ＋
-      </button>
-
-      <textarea
-        class="textarea"
-        id="input"
-        rows="1"
-        placeholder="Ask Crazy Assistant..."
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"></textarea>
-
-      <button
-        class="actionBtn"
-        id="voiceButton"
-        onclick="startVoice()"
-        title="Voice Input">
-        🎤
-      </button>
-
-      <button
-        class="actionBtn sendBtn"
-        onclick="sendMessage()"
-        title="Send">
-        ➤
-      </button>
-
-    </div>
-
-  </div>
-
-  <div class="bottomInfo">
-    Crazy Assistant can make mistakes. Check important information.
-  </div>
-
-</div>
-
-</section>
-
-</div>
-
-
-<!-- HIDDEN FILE INPUT -->
-
-<input
-  type="file"
-  id="fileInput"
-  hidden
-  accept="image/*,.pdf,.txt,.md,.csv,.json,.doc,.docx"
-  onchange="handleFile(event)">
-
-
-<!-- SETTINGS MODAL -->
-
-<div
-  class="modalOverlay"
-  id="settingsModal"
-  onclick="closeSettingsOutside(event)">
-
-  <div class="modal">
-
-    <div class="modalHeader">
-
-      <h2>⚙️ Settings</h2>
-
-      <button
-        class="closeBtn"
-        onclick="closeSettings()">
-        ✕
-      </button>
-
-    </div>
-
-
-    <div class="setting">
-
-      <div class="settingText">
-        <strong>🔊 Voice Output</strong>
-        <span>
-          Read AI responses aloud automatically.
-        </span>
+    <div class="history-title">CHAT HISTORY</div>
+    <div id="history"></div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <header class="topbar">
+      <div class="topbar-title">Crazy Assistant</div>
+
+      <select id="modeSelect">
+        <option value="assistant">Assistant</option>
+        <option value="coding">Coding</option>
+        <option value="study">Study</option>
+        <option value="creative">Creative</option>
+        <option value="gaming">Gaming</option>
+      </select>
+    </header>
+
+    <!-- Chat -->
+    <section id="chat">
+
+      <div class="welcome" id="welcome">
+        <h1>How can I help you?</h1>
+        <p>
+          Ask me anything. I can help with coding, websites,
+          studying, ideas, gaming and more.
+        </p>
       </div>
 
-      <label class="switch">
+    </section>
+
+    <!-- Composer -->
+    <div class="composer-area">
+
+      <div class="composer">
+
+        <label class="icon-btn" title="Upload file">
+          ＋
+          <input type="file" id="fileInput"
+                 accept="image/*,.pdf,.txt,.doc,.docx">
+        </label>
+
         <input
-          type="checkbox"
-          id="voiceOutput">
-        <span class="slider"></span>
-      </label>
+          type="text"
+          id="messageInput"
+          placeholder="Message Crazy Assistant..."
+          autocomplete="off"
+        >
 
-    </div>
+        <button class="icon-btn" id="voiceBtn" title="Voice">
+          🎤
+        </button>
 
-
-    <div class="setting">
-
-      <div class="settingText">
-        <strong>🌐 Web Search</strong>
-        <span>
-          Allow the AI backend to use web search when available.
-        </span>
-      </div>
-
-      <label class="switch">
-        <input
-          type="checkbox"
-          id="webSearch">
-        <span class="slider"></span>
-      </label>
-
-    </div>
-
-
-    <div class="setting">
-
-      <div class="settingText">
-        <strong>🌙 Interface</strong>
-        <span>
-          Current interface uses the dark theme.
-        </span>
-      </div>
-
-      <span>Dark</span>
-
-    </div>
-
-
-    <div class="setting">
-
-      <div class="settingText">
-
-        <strong>🤖 AI Persona</strong>
-
-        <span>
-          Choose how Crazy Assistant should respond.
-        </span>
-
-        <select
-          class="personaSelect"
-          id="persona">
-
-          <option value="normal">
-            Normal Assistant
-          </option>
-
-          <option value="friendly">
-            Friendly
-          </option>
-
-          <option value="professional">
-            Professional
-          </option>
-
-          <option value="teacher">
-            Teacher
-          </option>
-
-          <option value="coder">
-            Expert Coder
-          </option>
-
-        </select>
+        <button class="send-btn" id="sendBtn" title="Send">
+          ➤
+        </button>
 
       </div>
 
+      <div class="file-name" id="fileName"></div>
+
     </div>
 
-  </div>
-
+  </main>
 </div>
 
 
 <script>
+  // ==============================
+  // CRAZY ASSISTANT
+  // ==============================
 
-/* =====================================================
-   CRAZY ASSISTANT FRONTEND
-===================================================== */
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("messageInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const voiceBtn = document.getElementById("voiceBtn");
+  const newChatBtn = document.getElementById("newChatBtn");
+  const historyBox = document.getElementById("history");
+  const fileInput = document.getElementById("fileInput");
+  const fileName = document.getElementById("fileName");
+  const modeSelect = document.getElementById("modeSelect");
+  const welcome = document.getElementById("welcome");
 
-const chatInner = document.getElementById("chatInner");
-const input = document.getElementById("input");
-const welcome = document.getElementById("welcome");
-const historyBox = document.getElementById("history");
-const fileInput = document.getElementById("fileInput");
+  let messages = [];
+  let selectedFile = null;
+  let isSending = false;
 
-let messages = [];
-let currentFile = null;
-let currentChatId = null;
 
-let settings = {
-  voiceOutput:false,
-  webSearch:false,
-  persona:"normal"
-};
+  // ==============================
+  // LOAD HISTORY
+  // ==============================
 
+  function loadHistory() {
+    try {
+      const saved = localStorage.getItem("crazyAssistantMessages");
 
-/* =====================================================
-   LOAD
-===================================================== */
+      if (saved) {
+        messages = JSON.parse(saved);
+      }
+    } catch (error) {
+      messages = [];
+    }
 
-loadSettings();
-loadHistory();
+    renderChat();
+  }
 
 
-/* =====================================================
-   CHAT ID
-===================================================== */
+  // ==============================
+  // SAVE HISTORY
+  // ==============================
 
-function createChatId(){
+  function saveHistory() {
+    localStorage.setItem(
+      "crazyAssistantMessages",
+      JSON.stringify(messages)
+    );
+  }
 
-  return Date.now().toString();
 
-}
+  // ==============================
+  // RENDER CHAT
+  // ==============================
 
+  function renderChat() {
 
-/* =====================================================
-   NEW CHAT
-===================================================== */
+    chat.innerHTML = "";
 
-function newChat(){
+    if (messages.length === 0) {
+      chat.appendChild(welcome);
+      welcome.style.display = "block";
+      return;
+    }
 
-  messages = [];
+    welcome.style.display = "none";
 
-  currentChatId = createChatId();
+    messages.forEach(function(msg) {
+      addMessageToScreen(msg.role, msg.content, false);
+    });
 
-  chatInner.innerHTML = "";
+    scrollBottom();
+  }
 
-  const section = document.createElement("section");
 
-  section.className = "welcome";
+  // ==============================
+  // ADD MESSAGE
+  // ==============================
 
-  section.id = "welcome";
+  function addMessageToScreen(role, text, save = true) {
 
-  section.innerHTML = `
-    <div class="welcomeIcon">🤖</div>
+    const wrapper = document.createElement("div");
+    wrapper.className = "message " + role;
 
-    <h1>Hi! I'm Crazy Assistant</h1>
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
 
-    <p>
-      Ask me anything. I'm ready to help.
-    </p>
+    bubble.textContent = text;
 
-    <div class="quickGrid">
+    wrapper.appendChild(bubble);
+    chat.appendChild(wrapper);
 
-      <button class="quickCard"
-        onclick="quickAsk('मुझे JavaScript सीखने में मदद करो')">
-        💻 Coding
-      </button>
+    if (save) {
+      scrollBottom();
+    }
+  }
 
-      <button class="quickCard"
-        onclick="quickAsk('मुझे पढ़ाई में मदद चाहिए')">
-        📚 Study
-      </button>
 
-      <button class="quickCard"
-        onclick="quickAsk('एक YouTube video idea दो')">
-        ▶️ YouTube
-      </button>
+  // ==============================
+  // SCROLL
+  // ==============================
 
-      <button class="quickCard"
-        onclick="quickAsk('एक छोटी कहानी लिखो')">
-        ✍️ Creative
-      </button>
+  function scrollBottom() {
+    setTimeout(function() {
+      chat.scrollTop = chat.scrollHeight;
+    }, 50);
+  }
 
-    </div>
-  `;
 
-  chatInner.appendChild(section);
+  // ==============================
+  // SEND MESSAGE
+  // ==============================
 
-  currentFile = null;
+  async function sendMessage() {
 
-  document.getElementById("preview").style.display = "none";
+    if (isSending) return;
 
-  input.focus();
+    const text = input.value.trim();
 
-}
+    if (!text && !selectedFile) {
+      return;
+    }
 
+    isSending = true;
+    sendBtn.disabled = true;
 
-/* =====================================================
-   QUICK ASK
-===================================================== */
+    const previousHistory = messages.slice(-12);
 
-function quickAsk(text){
+    let displayText = text;
 
-  input.value = text;
+    if (!displayText && selectedFile) {
+      displayText = "Please analyze this file.";
+    }
 
-  autoResize(input);
+    // User message
+    messages.push({
+      role: "user",
+      content: displayText
+    });
 
-  sendMessage();
+    addMessageToScreen("user", displayText);
 
-}
+    input.value = "";
 
+    // Typing indicator
+    const typingWrapper = document.createElement("div");
+    typingWrapper.className = "message assistant";
 
-/* =====================================================
-   ADD USER MESSAGE
-===================================================== */
+    const typingBubble = document.createElement("div");
+    typingBubble.className = "bubble typing";
+    typingBubble.textContent = "Crazy Assistant is typing...";
 
-function addUserMessage(text){
+    typingWrapper.appendChild(typingBubble);
+    chat.appendChild(typingWrapper);
 
-  const row = document.createElement("div");
+    scrollBottom();
 
-  row.className = "message user";
 
-  row.innerHTML = `
+    try {
 
-    <div class="messageBody">
+      const payload = {
+        message: text || "Please analyze this file.",
+        history: previousHistory,
+        mode: modeSelect.value,
+        persona: "normal",
+        useWebSearch: false
+      };
 
-      <div class="bubble"></div>
 
-    </div>
+      // File
+      if (selectedFile) {
 
-    <div class="avatar">👤</div>
-
-  `;
-
-  row.querySelector(".bubble").textContent = text;
-
-  chatInner.appendChild(row);
-
-  scrollBottom();
-
-}
-
-
-/* =====================================================
-   ADD BOT MESSAGE
-===================================================== */
-
-function addBotMessage(text){
-
-  const row = document.createElement("div");
-
-  row.className = "message bot";
-
-  row.innerHTML = `
-
-    <div class="avatar">🤖</div>
-
-    <div class="messageBody">
-
-      <div class="bubble"></div>
-
-      <div class="messageTools">
-
-        <button
-          class="toolBtn"
-          onclick="copyText(this)">
-          📋 Copy
-        </button>
-
-        <button
-          class="toolBtn"
-          onclick="regenerate()">
-          🔄 Regenerate
-        </button>
-
-        <button
-          class="toolBtn"
-          onclick="speakText(this)">
-          🔊 Listen
-        </button>
-
-      </div>
-
-    </div>
-
-  `;
-
-  const bubble = row.querySelector(".bubble");
-
-  typeText(bubble,text);
-
-  chatInner.appendChild(row);
-
-  scrollBottom();
-
-}
-
-
-/* =====================================================
-   TYPING EFFECT
-===================================================== */
-
-function typeText(element,text){
-
-  element.textContent = "";
-
-  let i = 0;
-
-  const speed = 8;
-
-  function type(){
-
-    if(i >= text.length){
-
-      if(settings.voiceOutput){
-
-        speak(text);
+        payload.file = {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: selectedFile.data
+        };
 
       }
+
+
+      const response = await fetch("/api/chat", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(payload)
+
+      });
+
+
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch (e) {
+        data = {};
+      }
+
+
+      // Remove typing
+      typingWrapper.remove();
+
+
+      if (!response.ok) {
+
+        const errorMessage =
+          data.error ||
+          "Server error. Please check your Vercel API settings.";
+
+        messages.push({
+          role: "assistant",
+          content: "❌ " + errorMessage
+        });
+
+        addMessageToScreen(
+          "assistant",
+          "❌ " + errorMessage
+        );
+
+      } else {
+
+        const answer =
+          data.answer ||
+          "I couldn't generate a response.";
+
+        messages.push({
+          role: "assistant",
+          content: answer
+        });
+
+        addMessageToScreen(
+          "assistant",
+          answer
+        );
+
+      }
+
+
+      saveHistory();
+      renderHistory();
+
+    } catch (error) {
+
+      typingWrapper.remove();
+
+      const errorText =
+        "❌ Connection error. Please check your internet connection and Vercel deployment.";
+
+      messages.push({
+        role: "assistant",
+        content: errorText
+      });
+
+      addMessageToScreen(
+        "assistant",
+        errorText
+      );
+
+      saveHistory();
+
+    } finally {
+
+      isSending = false;
+      sendBtn.disabled = false;
+
+      selectedFile = null;
+      fileInput.value = "";
+      fileName.textContent = "";
+
+      input.focus();
+
+    }
+  }
+
+
+  // ==============================
+  // SEND BUTTON
+  // ==============================
+
+  sendBtn.addEventListener("click", function() {
+    sendMessage();
+  });
+
+
+  // ==============================
+  // ENTER KEY
+  // ==============================
+
+  input.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter" && !event.shiftKey) {
+
+      event.preventDefault();
+
+      sendMessage();
+
+    }
+
+  });
+
+
+  // ==============================
+  // NEW CHAT
+  // ==============================
+
+  newChatBtn.addEventListener("click", function() {
+
+    messages = [];
+
+    localStorage.removeItem("crazyAssistantMessages");
+
+    selectedFile = null;
+
+    fileInput.value = "";
+
+    fileName.textContent = "";
+
+    renderChat();
+
+    input.focus();
+
+  });
+
+
+  // ==============================
+  // FILE UPLOAD
+  // ==============================
+
+  fileInput.addEventListener("change", function() {
+
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    // Limit browser-side file size
+    if (file.size > 8 * 1024 * 1024) {
+
+      alert("File is too large. Please select a file under 8 MB.");
+
+      fileInput.value = "";
 
       return;
     }
 
-    element.textContent += text.charAt(i);
+    const reader = new FileReader();
 
-    i++;
+    reader.onload = function(event) {
 
-    scrollBottom();
+      selectedFile = {
+        name: file.name,
+        type: file.type,
+        data: event.target.result
+      };
 
-    setTimeout(type,speed);
+      fileName.textContent =
+        "📎 " + file.name;
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+
+
+  // ==============================
+  // VOICE INPUT
+  // ==============================
+
+  let recognition = null;
+
+  if (
+    "SpeechRecognition" in window ||
+    "webkitSpeechRecognition" in window
+  ) {
+
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+
+    recognition.onstart = function() {
+      voiceBtn.textContent = "🔴";
+    };
+
+
+    recognition.onend = function() {
+      voiceBtn.textContent = "🎤";
+    };
+
+
+    recognition.onresult = function(event) {
+
+      const transcript =
+        event.results[0][0].transcript;
+
+      input.value = transcript;
+
+      input.focus();
+
+    };
+
+
+    recognition.onerror = function() {
+      voiceBtn.textContent = "🎤";
+    };
+
+
+    voiceBtn.addEventListener("click", function() {
+
+      try {
+        recognition.start();
+      } catch (error) {
+        // Already running
+      }
+
+    });
+
+  } else {
+
+    voiceBtn.addEventListener("click", function() {
+
+      alert(
+        "Voice input is not supported by this browser."
+      );
+
+    });
 
   }
 
-  type();
 
-}
+  // ==============================
+  // CHAT HISTORY
+  // ==============================
+
+  function renderHistory() {
+
+    historyBox.innerHTML = "";
+
+    if (messages.length === 0) {
+      return;
+    }
+
+    const userMessages =
+      messages.filter(function(item) {
+        return item.role === "user";
+      });
 
 
-/* =====================================================
-   TYPING INDICATOR
-===================================================== */
+    userMessages.forEach(function(item) {
 
-function showTyping(){
+      const div =
+        document.createElement("div");
 
-  const row = document.createElement("div");
+      div.className = "history-item";
 
-  row.className = "message bot";
+      div.textContent =
+        item.content.substring(0, 35);
 
-  row.id = "typingMessage";
+      historyBox.appendChild(div);
 
-  row.innerHTML = `
+    });
 
-    <div class="avatar">🤖</div>
+  }
 
-    <div class="messageBody">
 
-      <div class="bubble">
+  // ==============================
+  // START
+  // ==============================
 
-        <div class="typing">
+  loadHistory();
+  renderHistory();
 
-          <span class="dot"></span>
-          <span class="dot"></span>
-          
+  input.focus();
+
+</script>
+
+</body>
+</html>
