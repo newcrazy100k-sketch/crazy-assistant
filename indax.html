@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Crazy Assistant</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#0b1020;
+  color:#fff;
+}
+.app{
+  max-width:900px;
+  margin:auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  padding:18px;
+  background:#11182d;
+  border-bottom:1px solid #26304d;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logoIcon{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#7c5cff,#00d4ff);
+  display:grid;
+  place-items:center;
+  font-size:22px;
+}
+h1{font-size:20px;margin:0}
+.sub{font-size:12px;color:#9da7c0;margin-top:3px}
+
+.lang{
+  border:1px solid #394462;
+  background:#1a223a;
+  color:#fff;
+  padding:9px 12px;
+  border-radius:10px;
+}
+
+.chat{
+  flex:1;
+  padding:22px 16px 120px;
+  overflow-y:auto;
+}
+.welcome{
+  text-align:center;
+  padding:45px 15px 25px;
+}
+.welcome h2{font-size:30px;margin:10px 0}
+.welcome p{color:#aab3ca;line-height:1.6}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  max-width:650px;
+  margin:25px auto;
+}
+.card{
+  background:#151e35;
+  border:1px solid #293553;
+  padding:14px;
+  border-radius:14px;
+  color:#dce3f5;
+  cursor:pointer;
+}
+.card:hover{background:#1b2743}
+.msg{
+  display:flex;
+  margin:14px 0;
+}
+.msg.user{justify-content:flex-end}
+.bubble{
+  max-width:82%;
+  padding:13px 15px;
+  border-radius:17px;
+  line-height:1.55;
+  white-space:pre-wrap;
+}
+.user .bubble{
+  background:#6755e8;
+  border-bottom-right-radius:5px;
+}
+.bot .bubble{
+  background:#172139;
+  border:1px solid #293553;
+  border-bottom-left-radius:5px;
+}
+
+.composer{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#0e1528;
+  border-top:1px solid #27314d;
+  padding:12px;
+}
+.inputBox{
+  max-width:900px;
+  margin:auto;
+  display:flex;
+  gap:8px;
+}
+input{
+  flex:1;
+  min-width:0;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid #394462;
+  background:#151e35;
+  color:white;
+  outline:none;
+}
+button{
+  border:0;
+  border-radius:13px;
+  padding:0 15px;
+  cursor:pointer;
+  font-size:16px;
+}
+.send{background:#6958ee;color:#fff}
+.voice{background:#202b47;color:#fff}
+.clear{background:#202b47;color:#fff}
+
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr}
+  .welcome h2{font-size:25px}
+  .bubble{max-width:90%}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="logo">
+    <div class="logoIcon">🤖</div>
+    <div>
+      <h1>Crazy Assistant</h1>
+      <div class="sub">Your General AI Assistant</div>
+    </div>
+  </div>
+
+  <select class="lang" id="lang" onchange="changeLanguage()">
+    <option value="hi">हिंदी</option>
+    <option value="en">English</option>
+    <option value="hinglish">Hinglish</option>
+  </select>
+</header>
+
+<main class="chat" id="chat">
+
+<div class="welcome" id="welcome">
+  <div style="font-size:55px">🤖</div>
+  <h2>Hi! I'm Crazy Assistant</h2>
+  <p>
+    Mujhse General Knowledge, Study, Technology, Gaming,
+    YouTube, Writing aur daily life ke questions poochho.
+  </p>
+
+  <div class="cards">
+    <div class="card" onclick="quickAsk('भारत की राजधानी क्या है?')">🌍 General Knowledge</div>
+    <div class="card" onclick="quickAsk('सूर्य के बारे में बताओ')">🔬 Science</div>
+    <div class="card" onclick="quickAsk('मुझे maths में मदद चाहिए')">📚 Study Help</div>
+    <div class="card" onclick="quickAsk('Free Fire क्या है?')">🎮 Gaming</div>
+    <div class="card" onclick="quickAsk('YouTube video के लिए title दो')">▶️ YouTube</div>
+    <div class="card" onclick="quickAsk('एक छोटी कहानी सुनाओ')">✍️ Stories</div>
+  </div>
+</div>
+
+</main>
+
+<div class="composer">
+  <div class="inputBox">
+    <button class="voice" onclick="startVoice()" title="Voice">🎤</button>
+    <input id="input" type="text"
+      placeholder="अपना सवाल लिखें..."
+      onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="send" onclick="sendMessage()">➤</button>
+    <button class="clear" onclick="clearChat()">🗑️</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+const chat=document.getElementById("chat");
+const input=document.getElementById("input");
+const welcome=document.getElementById("welcome");
+
+function addMessage(text,type){
+  const row=document.createElement("div");
+  row.className="msg "+type;
+
+  const bubble=document.createElement("div");
+  bubble.className="bubble";
+  bubble.textContent=text;
+
+  row.appendChild(bubble);
+  chat.appendChild(row);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function quickAsk(text){
+  input.value=text;
+  sendMessage();
+}
+
+function sendMessage(){
+  const text=input.value.trim();
+  if(!text)return;
+
+  if(welcome)welcome.style.display="none";
+
+  addMessage(text,"user");
+  input.value="";
+
+  setTimeout(()=>{
+    addMessage(getAnswer(text),"bot");
+  },500);
+}
+
+function getAnswer(q){
+
+  const t=q.toLowerCase();
+
+  /* GREETING */
+  if(
+    t.includes("hello") ||
+    t.includes("hi") ||
+    t.includes("hey") ||
+    t.includes("नमस्ते") ||
+    t.includes("हेलो")
+  ){
+    return "Namaste! 👋 Main Crazy Assistant hoon. Aap General Knowledge, Study, Science, Technology, Gaming, YouTube ya kisi bhi normal topic ke baare mein pooch sakte ho.";
+  }
+
+  /* INDIA */
+  if(t.includes("भारत की राजधानी") || t.includes("capital of india")){
+    return "भारत की राजधानी New Delhi (नई दिल्ली) है। 🇮🇳";
+  }
+
+  /* WORLD */
+  if(t.includes("सबसे बड़ा देश") || t.includes("largest country")){
+    return "क्षेत्रफल के हिसाब से दुनिया का सबसे बड़ा देश Russia है। 🌍";
+  }
+
+  if(t.includes("सबसे ऊंचा पर्वत") || t.includes("highest mountain")){
+    return "दुनिया का सबसे ऊँचा पर्वत Mount Everest है। 🏔️";
+  }
+
+  /* SCIENCE */
+  if(t.includes("सूर्य") || t.includes("sun")){
+    return "सूर्य हमारे Solar System का तारा है। यह पृथ्वी के लिए प्रकाश और ऊर्जा का मुख्य स्रोत है। ☀️";
+  }
+
+  if(t.includes("पृथ्वी") || t.includes("earth")){
+    return "पृथ्वी सूर्य से तीसरा ग्रह है और अब तक ज्ञात जीवन वाला ग्रह है। 🌎";
+  }
+
+  if(t.includes("चंद्रमा") || t.includes("moon")){
+    return "चंद्रमा पृथ्वी का प्राकृतिक उपग्रह है। 🌙";
+  }
+
+  if(t.includes("पानी का formula") || t.includes("water formula")){
+    return "पानी का chemical formula H₂O है। इसका मतलब है कि एक molecule में दो Hydrogen atoms और एक Oxygen atom होता है.";
+  }
+
+  /* MATH */
+  if(
+    t.includes("math") ||
+    t.includes("गणित") ||
+    t.includes("calculate") ||
+    /^[0-9+*/().\-\s]+$/.test(t)
+  ){
+    return "Maths में मैं मदद कर सकता हूँ। अपना सवाल इस तरह भेजो:\n\n25 × 4\n150 ÷ 5\n25 + 37\n\nमैं calculation समझाने की कोशिश करूँगा।";
+  }
+
+  /* STUDY */
+  if(
+    t.includes("study") ||
+    t.includes("पढ़ाई") ||
+    t.includes("homework") ||
+    t.includes("science question")
+  ){
+    return "बिल्कुल 📚 अपना question भेजो। मैं उसे आसान भाषा में समझाने, steps बनाने और revision points देने में मदद कर सकता हूँ.";
+  }
+
+  /* FREE FIRE */
+  if(
+    t.includes("free fire") ||
+    t.includes("ff") ||
+    t.includes("gaming")
+  ){
+    return "Free Fire एक battle royale game है। 🎮 अगर आपको game के बारे में कोई सामान्य जानकारी, gameplay tips या content ideas चाहिए तो अपना specific question पूछो.";
+  }
+
+  /* YOUTUBE */
+  if(
+    t.includes("youtube") ||
+    t.includes("title") ||
+    t.includes("thumbnail") ||
+    t.includes("seo")
+  ){
+    return "YouTube के लिए मैं title, description, tags, SEO ideas और thumbnail concepts बनाने में मदद कर सकता हूँ. 🎬\n\nबस अपना video topic बताओ.";
+  }
+
+  /* INSTAGRAM */
+  if(
+    t.includes("instagram") ||
+    t.includes("caption") ||
+    t.includes("username")
+  ){
+    return "Instagram के लिए मैं username ideas, captions, bio ideas और सामान्य reply suggestions दे सकता हूँ. 📱";
+  }
+
+  /* STORY */
+  if(
+    t.includes("story") ||
+    t.includes("कहानी") ||
+    t.includes("script") ||
+    t.includes("स्क्रिप्ट")
+  ){
+    return "ज़रूर! ✍️ मैं short story, YouTube script और सामान्य creative ideas बनाने में मदद कर सकता हूँ. अपना topic और desired length बताओ.";
+  }
+
+  /* TECHNOLOGY */
+  if(
+    t.includes("technology") ||
+    t.includes("tech") ||
+    t.includes("computer") ||
+    t.includes("coding") ||
+    t.includes("code")
+  ){
+    return "Technology और coding से जुड़े सामान्य सवाल भी पूछ सकते हो. 💻 उदाहरण: HTML क्या है? JavaScript क्या है? Website कैसे काम करती है?";
+  }
+
+  /* GENERAL KNOWLEDGE */
+  if(
+    t.includes("general knowledge") ||
+    t.includes("gk") ||
+    t.includes("knowledge")
+  ){
+    return "General Knowledge में मैं Geography, History, Science, Space, Technology, India और दुनिया से जुड़े topics समझा सकता हूँ. 🌍\n\nकोई भी specific सवाल पूछो.";
+  }
+
+  /* HELP */
+  if(
+    t.includes("help") ||
+    t.includes("मदद") ||
+    t.includes("क्या कर सकते")
+  ){
+    return "मैं इन चीज़ों में मदद कर सकता हूँ:\n\n🌍 General Knowledge\n📚 Study\n🔬 Science\n💻 Technology\n🎮 Gaming\n▶️ YouTube\n📱 Social Media\n✍️ Stories & Scripts\n🧮 Basic calculations\n\nअपना सवाल सीधे पूछो.";
+  }
+
+  /* DEFAULT */
+  return "अच्छा सवाल है! 🤖\n\nमैं General Knowledge, Science, History, Geography, Technology, Study, Gaming, YouTube, Writing और कई सामान्य topics पर मदद कर सकता हूँ.\n\nअगर तुम्हें किसी specific सवाल का जवाब चाहिए, तो उसे थोड़ा detail में लिखो.";
+}
+
+
+/* VOICE INPUT */
+
+function startVoice(){
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+    alert("आपके browser में voice input supported नहीं है.");
+    return;
+  }
+
+  const recognition=new SpeechRecognition();
+
+  const lang=document.getElementById("lang").value;
+
+  if(lang==="en"){
+    recognition.lang="en-IN";
+  }else{
+    recognition.lang="hi-IN";
+  }
+
+  recognition.start();
+
+  recognition.onresult=function(event){
+    input.value=event.results[0][0].transcript;
+    sendMessage();
+  };
+
+  recognition.onerror=function(){
+    alert("Voice input में problem आई. फिर से try करो.");
+  };
+}
+
+
+/* LANGUAGE */
+
+function changeLanguage(){
+
+  const lang=document.getElementById("lang").value;
+
+  if(lang==="en"){
+    input.placeholder="Ask anything...";
+  }else if(lang==="hinglish"){
+    input.placeholder="Apna question likho...";
+  }else{
+    input.placeholder="अपना सवाल लिखें...";
+  }
+}
+
+
+/* CLEAR CHAT */
+
+function clearChat(){
+
+  document.querySelectorAll(".msg").forEach(e=>e.remove());
+
+  if(welcome){
+    welcome.style.display="block";
+  }
+}
+
+</script>
+
+</body>
+</html>
